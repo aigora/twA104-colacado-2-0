@@ -1,11 +1,11 @@
-# Título del trabajo
+# Minijuegos de 5 LEDS
 
-Descripción breve del proyecto a realizar (2-3 frases).
+Proyecto arduino con 5 leds y 3 minijuegos.
 
 ## Integrantes del equipo
 
-Nombres, apellidos, y usuario GitHub de los integrantes del equipo.
+Javier Pío González Alday y Jesús García
 
 ## Objetivos del trabajo
 
-Lista de los objetivos que se persiguen con el trabajo propuesto.
+Desarrollar 3 minijuegos para la distribución física del proyecto.
