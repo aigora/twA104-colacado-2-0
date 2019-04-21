@@ -13,8 +13,6 @@ int i, ronda=8, secuencia[8]={0, 1, 2, 3, 3, 0, 2, 1};
     // "ronda" indica en que nivel estamos y el número de leds que se encenderán.
     // "secuencia" es un vector creado aleatoriamente que contendrá la posicón en el vector del led que se tiene que encender.
 
-
-
     
 void setup() {
   //Inicializo los pines de entrada y salida
@@ -28,19 +26,12 @@ void setup() {
 
 void loop() {
   inicio_juego();
-
   
   enunciado(ronda, secuencia);
   delay(3000);
-
-  
-
+    
   game_over();
 }
-
-
-
-
 
 
 // Funciones.
