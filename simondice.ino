@@ -1,13 +1,14 @@
 //                                                       SIMÓN DICE
 //Prototipos de funciones.
 void inicio_juego();						//La función "inicio_juego" muestra que se ha iniciado el juego.
-void game_over();							//La función "game_over" muestra que se has perdido el juego.
+void acierto_fallo(int);					//La función "acierto_fallo" te dice si has acertado o has fallado.
+void game_over();						//La función "game_over" muestra que se has perdido el juego.
 void fin_secuencia();						//La función "fin_secuencia" enciende y apaga 2 veces los leds para indicar el fin de la secuencia mostrada por los leds.
-void paso_ronda(int);							//La función "paso_ronda" muestra por el monitor serial en que ronda nos encontramos.
-void enunciado_secuencia(int, int[]);		//La función "enunciado_secuencia" mostrará por los 4 leds la secuencia creada aleatoriamente.
-void leer_secuencia(int, int[]);			//La función "leer_secuencia" se encargará de leer la secuencia  introducida por el usuario mediante los botones.
-int comparar_secuencia(int, int*, int[], int[]);				//La función "comparar_secuencia" comparará el vector secuencia y pulso para comprobar si hay algún error.
-//void mostrar_fallos();						//La función "mostrar_fallo" te dirá en que botón has fallado.
+void paso_ronda(int);						//La función "paso_ronda" muestra por el monitor serial en que ronda nos encontramos.
+void enunciado_secuencia(int, int[]);				//La función "enunciado_secuencia" mostrará por los 4 leds la secuencia creada aleatoriamente.
+void leer_secuencia(int, int[]);				//La función "leer_secuencia" se encargará de leer la secuencia  introducida por el usuario mediante los botones.
+int comparar_secuencia(int, int*, int[], int[]);		//La función "comparar_secuencia" comparará el vector secuencia y pulso para comprobar si hay algún error.
+//void mostrar_fallos();					//La función "mostrar_fallo" te dirá en que botón has fallado.
 
 //Variables globales (Las utilizo para no tener que declararlas siempre en todas las funciones.)
 int led[4] = { 2, 3, 4, 5 };
@@ -40,12 +41,13 @@ void loop() {
 	{
 		paso_ronda(ronda);
 		enunciado_secuencia(ronda, secuencia);
-		delay(3000);
 		leer_secuencia(ronda, pulso);
-		delay(3000);
 		flagfail = comparar_secuencia(ronda, &ronda, secuencia, pulso);
+		acierto_fallo(flagfail); //En caso de acertar
+		delay(1000);
 	}
 	game_over();
+	delay(3000); //Tiempo hasta nuevo juego (3 segs)
 }
 
 
@@ -86,12 +88,15 @@ void leer_secuencia(int x, int vect[]) // "x" es la ronda. "pulso[]" es el vecto
 		Serial.print(cont);
 		Serial.print(" --> ");
 		// ¡¡¡OJO!!! Para que se rellene el vector hay que mantener pulsado el boton hasta que parpadee la luz (confirmación de lectura).
-
-		digitalRead(10);
-		digitalRead(11);
-		digitalRead(12);
-		digitalRead(13);
-		delay(3000);
+		
+		//Este bucle while me sirve para esperar a que el usuario pulse un boton.
+		while ((digitalRead(10) == 0) && (digitalRead(11) == 0) && (digitalRead(12) == 0) && (digitalRead(13) == 0))
+		{
+			digitalRead(10);
+			digitalRead(11);
+			digitalRead(12);
+			digitalRead(13);
+		}
 
 		if (digitalRead(10) == HIGH)
 		{
@@ -121,7 +126,7 @@ void leer_secuencia(int x, int vect[]) // "x" es la ronda. "pulso[]" es el vecto
 			delay(100);
 			digitalWrite(5, LOW);
 		}
-		delay(1000);
+		delay(250);
 
 		cont++;
 		Serial.println(vect[i]); //Muestro el boton que se pulsa en cada turno.
@@ -196,11 +201,64 @@ void inicio_juego()
 }
 
 
-void game_over()
+void acierto_fallo (int x)
 {
-	Serial.println("\nGAME OVER SIMON DICE.\n");
+	if (x == 0) //Si acierta
+	{
+		Serial.println("CORRECTO!");
+	}
+	else
+	{
+		Serial.println("FALLASTE!");
+	}
 }
 
+void game_over()
+{
+	int i, j;
+
+	Serial.println("GAME OVER SIMON DICE.\n\n");
+
+	//Juego de luces final
+	//for (i = 0; i < 3; i++)
+	//{
+	//	for (j = 2; j <= 5; j++)
+	//	{
+	//		switch (j)
+	//		{
+	//		case 2:
+	//			digitalWrite(2, HIGH);
+	//			digitalWrite(3, LOW);
+	//			digitalWrite(4, LOW);
+	//			digitalWrite(5, LOW);
+	//			break;
+	//		case 3:
+	//			digitalWrite(2, LOW);
+	//			digitalWrite(3, HIGH);
+	//			digitalWrite(4, LOW);
+	//			digitalWrite(5, LOW);
+	//			break;
+	//		case 4:
+	//			digitalWrite(2, LOW);
+	//			digitalWrite(3, LOW);
+	//			digitalWrite(4, HIGH);
+	//			digitalWrite(5, LOW);
+	//			break;
+	//		case 5:
+	//			digitalWrite(2, LOW);
+	//			digitalWrite(3, LOW);
+	//			digitalWrite(4, LOW);
+	//			digitalWrite(5, HIGH);
+	//			break;
+	//		}
+	//	}
+	//}
+
+	//for (j = 2; j <= 5; i++) // Apago los leds
+	//{
+	//	digitalWrite(i, LOW);
+	//}
+}
 
 void paso_ronda(int x)
 {
