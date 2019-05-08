@@ -1,4 +1,4 @@
-//                                                                              SIMÓN DICE
+//                                                                              SIMÓN DICE.
 #define _CRT_SECURE_NO_DEPRECATE
 #include<stdlib.h>
 #define N 3
