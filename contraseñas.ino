@@ -8,7 +8,7 @@ void inicio_juego();
 void leer_secuencia(int*);
 int comparar_secuencia(int*, int*);
 void game_over();
-
+void acierto_fallo(int*);
 
 typedef struct {
 
@@ -28,7 +28,7 @@ void setup() {
 
 	//Inicializo los pines de entrada y salida
 
-	for (i = 0; i < 4; i++){
+	for (i = 0; i < 4; i++) {
 
 		pinMode(pines.led[i], OUTPUT);
 		pinMode(pines.boton[i], INPUT);
@@ -40,40 +40,62 @@ void setup() {
 void loop() {
 
 	int i, flagfail = 0;
-	int *psecuencia, *ppulso;
- 
+	int secuencia[N], pulso[N], *psecuencia, *ppulso;
+	psecuencia = &secuencia[0];
+	ppulso = &pulso[0];
 	for (i = 0; i < N; i++)
 	{
-		*(psecuencia + i) = rand() % (N + 1);		///Le asigno un valor aleatorio de 0 a 3 al vector psecuencia.
+		///Le asigno un valor aleatorio de 0 a 3 al vector secuencia, sin repetirse.
+		switch (i) {
+		case 0:
+			*(psecuencia + i) = rand() % (N);
+		case 1:
+			do
+			{
+				*(psecuencia + i) = rand() % (N);
+			} while (*(psecuencia + i) == *(psecuencia + i - 1));
+		case 2:
+			do
+			{
+				*(psecuencia + i) = rand() % (N);
+			} while (*(psecuencia + i) == *(psecuencia + i - 1) || *(psecuencia + i) == *(psecuencia + i - 2));
+		case 3:
+			do
+			{
+				*(psecuencia + i) = rand() % (N);
+			} while (*(psecuencia + i) == *(psecuencia + i - 1) || *(psecuencia + i) == *(psecuencia + i - 2) || *(psecuencia + i) == *(psecuencia + i - 3));
+
+		}
+
+	}
+	//ESTO MUESTRA LA CONTRASEÑA POR PANTALLA
+	for (i = 0; i < N; i++) {
+		Serial.println(*(psecuencia + i));
 	}
 
 	inicio_juego();
 
-	while (flagfail == 0){
-		
+	while (flagfail == 0) {
+
 		leer_secuencia(ppulso);
 		delay(500);
 		flagfail = comparar_secuencia(psecuencia, ppulso);
+		acierto_fallo(&flagfail);
 
-		digitalWrite(3, HIGH);
-		digitalWrite(4, HIGH);
-		delay(200);
-		digitalWrite(3, LOW);
-		digitalWrite(4, LOW);
-	
+
 	}
 
 	game_over();
 
 }
 
-void inicio_juego(){
+void inicio_juego() {
 
-	Serial.println("\nINICIO SIMON DICE.");
+	Serial.println("\nINICIO CONTRA.");
 
 }
 
-void leer_secuencia(int *vect) {
+void leer_secuencia(int* vect) {
 
 	int i;
 	for (i = 0; i < N; i++) {
@@ -153,7 +175,6 @@ int comparar_secuencia(int *x, int *y) {
 		// Si son el mismo vector, eso es que se ha acertado y el valor de flag seguirá siendo 0;
 		else
 		{
-			//Si acertamos, aumento una ronda. (A lo que apunta r(ronda), le doy el valor de w(ronda) mas una unidad).
 			flag = 0;
 		}
 	}
@@ -162,8 +183,27 @@ int comparar_secuencia(int *x, int *y) {
 
 }
 
+void acierto_fallo(int* x) //x es el valor de flagfail
+{
+	if (*x == 0)//Si hemos acertado todo.
+	{
+		Serial.println("Acertaste");
+		digitalWrite(3, HIGH);
+		digitalWrite(4, HIGH);
+		delay(200);
+		digitalWrite(3, LOW);
+		digitalWrite(4, LOW);
+	}
+	else
+	{
+		Serial.println("Fallaste");
+		//Encontrar la forma de decirle al usuario que botones ha acertado.
+
+	}
+}
 void game_over() {
 	Serial.println("\nGAME OVER");
+
 	digitalWrite(2, HIGH);
 	digitalWrite(5, HIGH);
 	delay(200);
