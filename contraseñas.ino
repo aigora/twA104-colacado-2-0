@@ -241,6 +241,20 @@ void acierto_fallo(int* x) //x es el valor de flagfail
 		digitalWrite(5, HIGH);
 		delay(200);
 		digitalWrite(5, LOW);
+		
+		digitalWrite(2, HIGH);
+		digitalWrite(3, HIGH);
+		delay(200);
+		digitalWrite(2, LOW);
+		digitalWrite(3, LOW);
+		delay(100);
+		digitalWrite(4, HIGH);
+		digitalWrite(5, HIGH);
+		delay(200);
+		digitalWrite(4, LOW);
+		digitalWrite(5, LOW);
+		
+		
 	}
 	else
 	{
