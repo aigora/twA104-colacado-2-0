@@ -1,4 +1,4 @@
-// PRIMERA VERSIÓN INCOMPLETA DEL DESCIFRA EL CÓDIGO.
+// DESCIFRA EL CÓDIGO.
 
 #define _CRT_SECURE_NO_DEPRECATE
 #include<stdlib.h>
@@ -17,7 +17,6 @@ typedef struct {
 	int boton[4] = { 10, 11, 12, 13 };
 
 }PIN;
-
 
 
 void setup() {
@@ -79,7 +78,7 @@ void loop() {
 
 		leer_secuencia(ppulso);
 		delay(500);
-		flagfail = comparar_secuencia(psecuencia, ppulso);
+		flagfail = comparar_secuencia(psecuencia, ppulso); //(secuencia,pulso)
 		acierto_fallo(&flagfail);
 
 
@@ -164,20 +163,59 @@ void leer_secuencia(int* vect) {
 }
 
 int comparar_secuencia(int *x, int *y) {
-	int i, flag = 0;
+	int i, flag = 0, v1[N], v2[N];
 
-	for (i = 0; i < N; i++)//Comprobación de si he acertado o no en la ronda. (Comparo si los vectores de secuencia y pulso son iguales).
-	{
-		if (*(x + i) != *(y + i)) //En caso de fallar, activo el flagfail a 1 
-		{
-			flag = 1;
-		}
-		// Si son el mismo vector, eso es que se ha acertado y el valor de flag seguirá siendo 0;
-		else
-		{
-			flag = 0;
-		}
+	for (i = 0; i < N; i++) {
+		*(x + i);
+		v1[i] = *(x + i);
 	}
+	for (i = 0; i < N; i++) {
+		*(y + i);
+		v2[i] = *(y + i);
+	}
+  
+  //ILUMINA LAS QUE HAS FALLADO.
+	if (v1[0] != v2[0]) {
+		digitalWrite(2, HIGH); 
+
+		delay(200);
+
+		digitalWrite(2, LOW);
+	}
+	if (v1[1] != v2[1]) {
+		digitalWrite(3, HIGH);
+
+		delay(200);
+
+		digitalWrite(3, LOW);
+	}
+	if (v1[2] != v2[2]) {
+		digitalWrite(4, HIGH);
+
+		delay(200);
+
+		digitalWrite(4, LOW);
+	}
+	if (v1[3] != v2[3]) {
+		digitalWrite(5, HIGH);
+
+		delay(200);
+
+		digitalWrite(5, LOW);
+	}
+
+	if (v1[0] != v2[0] || v1[1] != v2[1] || v1[2] != v2[2] || v1[3] != v2[3]) //En caso de fallar, activo el flagfail a 1
+	{
+		flag = 1;
+	}
+	// Si son el mismo vector, eso es que se ha acertado y el valor de flag seguirá siendo 0;
+	else
+	{
+		flag = 0;
+	}
+
+
+	
 	return flag;
 
 
@@ -188,25 +226,28 @@ void acierto_fallo(int* x) //x es el valor de flagfail
 	if (*x == 0)//Si hemos acertado todo.
 	{
 		Serial.println("Acertaste");
-		digitalWrite(3, HIGH);
-		digitalWrite(4, HIGH);
+		digitalWrite(2, HIGH);
+		delay(200);
+		digitalWrite(2, LOW);
+		delay(100);
+		digitalWrite(3, HIGH); 
 		delay(200);
 		digitalWrite(3, LOW);
+		delay(100);
+		digitalWrite(4, HIGH);
+		delay(200);
 		digitalWrite(4, LOW);
+		delay(100);
+		digitalWrite(5, HIGH);
+		delay(200);
+		digitalWrite(5, LOW);
 	}
 	else
 	{
 		Serial.println("Fallaste");
 		//Encontrar la forma de decirle al usuario que botones ha acertado.
-
-	}
+    }
 }
 void game_over() {
 	Serial.println("\nGAME OVER");
-
-	digitalWrite(2, HIGH);
-	digitalWrite(5, HIGH);
-	delay(200);
-	digitalWrite(2, LOW);
-	digitalWrite(5, LOW);
 }
