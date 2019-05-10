@@ -176,11 +176,11 @@ int comparar_secuencia(int *x, int *y) {
   
   //ILUMINA LAS QUE HAS FALLADO.
 	if (v1[0] != v2[0]) {
-		digitalWrite(2, HIGH); 
+		digitalWrite(5, HIGH); 
 
 		delay(200);
 
-		digitalWrite(2, LOW);
+		digitalWrite(5, LOW);
 	}
 	if (v1[1] != v2[1]) {
 		digitalWrite(3, HIGH);
@@ -197,11 +197,11 @@ int comparar_secuencia(int *x, int *y) {
 		digitalWrite(4, LOW);
 	}
 	if (v1[3] != v2[3]) {
-		digitalWrite(5, HIGH);
+		digitalWrite(2, HIGH);
 
 		delay(200);
 
-		digitalWrite(5, LOW);
+		digitalWrite(2, LOW);
 	}
 
 	if (v1[0] != v2[0] || v1[1] != v2[1] || v1[2] != v2[2] || v1[3] != v2[3]) //En caso de fallar, activo el flagfail a 1
