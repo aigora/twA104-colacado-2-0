@@ -245,7 +245,7 @@ void leer_secuencia(int *x, int *vect) // "x" es la ronda. "*vect" es el vector 
 		lcd.setCursor(0, 1);
 		lcd.print("PULSO ");
 		lcd.print(cont);
-		lcd.print("--> ");
+		lcd.print("-->      ");
 		// ¡¡¡OJO!!! Para que se rellene el vector hay que dejar que parpadee la luz (confirmación de lectura).
 
 		//Este bucle while me sirve para esperar a que el usuario pulse un boton.
