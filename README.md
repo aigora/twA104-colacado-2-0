@@ -1,4 +1,4 @@
-# Minijuegos de 5 LEDS
+# Minijuegos de 4 LEDS
 
 Proyecto arduino.
 
