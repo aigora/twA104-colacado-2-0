@@ -174,36 +174,23 @@ int comparar_secuencia(int *x, int *y) {
 		v2[i] = *(y + i);
 	}
   
-  //ILUMINA LAS QUE HAS FALLADO.
-	if (v1[0] != v2[0]) {
-		digitalWrite(5, HIGH); 
-
-		delay(200);
-
-		digitalWrite(5, LOW);
-	}
-	if (v1[1] != v2[1]) {
-		digitalWrite(3, HIGH);
-
-		delay(200);
-
-		digitalWrite(3, LOW);
-	}
-	if (v1[2] != v2[2]) {
-		digitalWrite(4, HIGH);
-
-		delay(200);
-
-		digitalWrite(4, LOW);
-	}
-	if (v1[3] != v2[3]) {
-		digitalWrite(2, HIGH);
-
-		delay(200);
-
-		digitalWrite(2, LOW);
-	}
-
+  
+   //ILUMINA LAS QUE HAS FALLADO.
+  
+  for(i=0;i<N;i++)
+  {
+   
+    if(v1[i]!=v2[i])
+    {
+      
+     digitalWrite(pines.led[i], HIGH); 
+     
+     delay(200);
+      
+     digitalWrite(pines.led[i], LOW);
+    }
+	  
+	  
 	if (v1[0] != v2[0] || v1[1] != v2[1] || v1[2] != v2[2] || v1[3] != v2[3]) //En caso de fallar, activo el flagfail a 1
 	{
 		flag = 1;
