@@ -77,7 +77,7 @@ void loop() {
 				}
 			}
 
-			//ESTO MUESTRA LA CONTRASEÑA POR PANTALLA
+			//ESTO MUESTRA LA CONTRASEÑA POR PANTALLA. A la hora de jugar se quita para que no se vea.
 			for (i = 0; i < N; i++) {
 				Serial.print(*(psecuencia + i));
 			}
@@ -191,7 +191,7 @@ int comparar_secuencia(int *x, int *y, int *flag) {
   }
   
   
-	//ILUMINA LAS QUE HAS FALLADO.
+	
 
 	for (i = 0; i < N; i++)
 	{
@@ -200,6 +200,8 @@ int comparar_secuencia(int *x, int *y, int *flag) {
 			Serial.print("\nHas fallado en el pulso ");
 
 			Serial.println(i + 1);
+			
+			//El Serial.print que te pone que tienes que pulsar se quitaria. 
 
 			Serial.print("Tenias que pulsar ");
 
