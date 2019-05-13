@@ -10,18 +10,19 @@ LiquidCrystal lcd(A0, A1, 9, 8, 7, 6);
 //Prototipos de funciones.
 
 	///FUNCIONES PRINCIPALES
-void seleccion_nivel(int*, int*, int*);		//La función "seleccion_nivel" se encargará de determinar el grado de dificultad de la partida.
-void enunciado_secuencia(int*, int*);				//La función "enunciado_secuencia" mostrará por los 4 leds la secuencia creada aleatoriamente.
-void leer_secuencia(int*, int*);						//La función "leer_secuencia" se encargará de leer la secuencia  introducida por el usuario mediante los botones.
-int comparar_secuencia(int, int*, int*, int*, int*);		//La función "comparar_secuencia" comparará el vector secuencia y pulso para comprobar si hay algún error.
-void mostrar_fallos(int*, int*, int*);				//La función "mostrar_fallo" te dirá en que botón has fallado.
+void seleccion_nivel(int*, int*, int*);				// La función "seleccion_nivel" determinará el grado de dificultad de la partida.
+void crear_enunciado(int*, int*);				// La función "crear_enunciado" creará el vector aleatorio a adivinar.
+void enunciado_secuencia(int*, int*);				// La función "enunciado_secuencia" mostrará por los 4 leds la secuencia creada aleatoriamente.
+void leer_secuencia(int*, int*);				// La función "leer_secuencia" leerá la secuencia introducida por el usuario mediante los botones.
+int comparar_secuencia(int, int*, int*, int*, int*);		// La función "comparar_secuencia" comparará el vector secuencia y pulso para comprobar si hay algún error.
+void mostrar_fallos(int*, int*, int*);				// La función "mostrar_fallo" dirá en que botón has fallado y cual deberías haber pulsado (El mesaje aparece por el monitor serial).
 
 	///FUNCIONES SECUNDARIAS
-void inicio_juego();								//La función "inicio_juego" muestra que se ha iniciado el juego.
-void game_over(int, int*, int*, int*);								//La función "game_over" indiga si el jugador ha ganado o a perdido.
-void acierto_fallo(int, int*);							//La función "acierto_fallo" te dice si has acertado o has fallado.
-void fin_secuencia();								//La función "fin_secuencia" enciende y apaga 2 veces los leds para indicar el fin de la secuencia mostrada por los leds.
-void paso_ronda(int*);								//La función "paso_ronda" muestra por el monitor serial en que ronda nos encontramos.
+void inicio_juego();						// La función "inicio_juego" indicará que se ha iniciado el juego.
+void game_over(int, int*, int*, int*);				// La función "game_over" indicará si el jugador ha ganado o ha perdido la partida
+void acierto_fallo(int, int*);					// La función "acierto_fallo" indicará si has acertado o has fallado al introducir la secuencia.
+void fin_secuencia();						// La función "fin_secuencia" indicará el fin de la secuencia mostrada o introducida por los leds.
+void paso_ronda(int*);						// La función "paso_ronda" mostrará en que ronda nos encontramos.
 
 	///FUNCIONES PARA ANIMACONES DE LEDS
 void esperaI();
@@ -40,58 +41,54 @@ void setup() {
 	Serial.begin(9600);
 	int i;
 	PIN pines;
-	//Inicializo los pines de entrada y salida
+	// Inicializo los pines de entrada y salida
 	for (i = 0; i < 4; i++)
 	{
 		pinMode(pines.led[i], OUTPUT);
 		pinMode(pines.boton[i], INPUT);
 	}
-
-	// Configuramos las filas y las columnas del LCD en este caso 16 columnas y 2 filas
+	// Inicializo las columnas y las filas del LCD
 	lcd.begin(COLS, ROWS);
 }
 
 void loop() {
-	//Variables
+// Variables
 	int i, ronda = 1, rondamax = 0, fallos = 0, *pronda, *prondamax, *pfallos, flagfail = 0;
 	int *psecuencia, *ppulso;
 	pronda = &ronda;
 	prondamax = &rondamax;
 	pfallos = &fallos;
-	/// "ronda" indica en que nivel estamos y el número de leds que se encenderán.
-	/// "flagfail" me servirá para saber si hay algún fallo en la secuencia introducida por los botones.
-	/// "nivel" indicará el grado de dificultad de la partida.
-	/// "rondamax" variará dependiendo del nivel en el que estemos
-	/// Variables para la creación de los vectores dinámicos.
-
+		/// "ronda"	variable entera que indica en que ronda nos encontramos dentro de la partida, y también, el número de leds a adivinar.
+		/// "rondamax"	variable entera tendrá el valor de el número máximo de rondas. Variará dependiendo del nivel en el que estemos.
+		/// "fallos"	variable entera que aumentará a medida que se encuentren los fallos en un 
+		/// "flagfail"	variable entera me servirá para saber si hay algún fallo en la secuencia introducida por los botones. Si su valor es distinto de 0 siginifica que hemos perdido.
+		/// "*psecuencia" y "*ppulso" punteros para la creación de los vectores dinámicos.
 	lcd.clear();
 	inicio_juego();
 
-//Determino el nivel de la partida.
+// Determino el nivel de la partida.
 	seleccion_nivel(prondamax, psecuencia, ppulso);
 
-	//Inicializo los vectores dinámicos
+// Inicializo los vectores dinámicos.
 	psecuencia = (int*)malloc((*prondamax) * sizeof(int));
 	ppulso = (int*)malloc((*prondamax) * sizeof(int));
 	if (psecuencia == NULL)
 	{
 		Serial.println("Error de memoria en VECTOR SECUENCIA.\n");
-		exit(1);	///Si no hay espacio en memoria dinámica salir del programa.
+		exit(1);	/// Si no hay espacio en memoria dinámica salir del programa.
 	}
 	if (ppulso == NULL)
 	{
 		Serial.println("Error de memoria en VECTOR PULSO.\n");
-		exit(1);	///Si no hay espacio en memoria dinámica salir del programa.
+		exit(1);	/// Si no hay espacio en memoria dinámica salir del programa.
 	}
 
-	///Inicializo la secuencia a adivinar.
-	for (i = 0; i < (*prondamax); i++)
-	{
-		*(psecuencia + i) = rand() % (N + 1);		///Le asigno un valor aleatorio de 0 a 3 al vector psecuencia.
-	}
+// Inicializo la secuencia a adivinar.
+	crear_enunciado(psecuencia, prondamax);
 
-	//FLUJO PRINCIPAL DEL JUEGO.
-	while ((flagfail == 0) && (ronda <= rondamax))
+// FLUJO PRINCIPAL DEL JUEGO.
+	/// Mientras que no fallemos y no lleguemos al límite de rondas, seguiremos jugando.
+	while ((flagfail == 0) && (ronda <= rondamax)) 
 	{
 		paso_ronda(pronda);
 		enunciado_secuencia(pronda, psecuencia);
@@ -101,12 +98,13 @@ void loop() {
 		acierto_fallo(flagfail, pfallos);
 		delay(500);
 	}
+	
 	game_over(flagfail, psecuencia, ppulso, pronda);
 
 	free(psecuencia);
 	free(ppulso);
 	apagar_led();
-	delay(2500);	///Tiempo hasta nuevo juego (2.5 segs)
+	delay(2500);	/// Tiempo hasta nuevo juego (2.5 segs)
 }
 
 
@@ -115,13 +113,15 @@ void loop() {
 void seleccion_nivel(int *y, int *vectI, int *vectII)
 {
 	int i;
-	//Elección del nivel de dificultad.
+	
+	/// Muestro los mensajes por el monitor seria y por el LCD.
 	Serial.println("\nSELECCIONA LA DIFICULTAD:\n 0-->Facil (5 rondas)\n 1-->Medio (10 rondas)\n 2-->Dificil (15 rondas)\n 3-->Extremo (30 rondas)");
 	lcd.setCursor(1, 0);
 	lcd.print("Elige el nivel");
 	lcd.setCursor(5, 1);
 	lcd.print("3 2 1 0");
-
+	
+	/// Espero a que el usuario pulse algún botón 
 	while ((digitalRead(10) == 0) && (digitalRead(11) == 0) && (digitalRead(12) == 0) && (digitalRead(13) == 0))
 	{
 		esperaI();
@@ -132,9 +132,9 @@ void seleccion_nivel(int *y, int *vectI, int *vectII)
 		esperaII();
 	}
 
-	if (digitalRead(10) == HIGH)	///FÁCIL
+	if (digitalRead(10) == HIGH)		/// FÁCIL
 	{
-		*y = 5;//Numero de rondas
+		*y = 5; /// Numero de rondas máximas.
 
 		Serial.println("FACIL");
 		lcd.clear();
@@ -143,16 +143,17 @@ void seleccion_nivel(int *y, int *vectI, int *vectII)
 		lcd.setCursor(0, 1);
 		lcd.print("5 rondas");
 
-		digitalWrite(2, HIGH); ///CONFIRMACIÓN DE LECTURA.
+		digitalWrite(2, HIGH); /// Confirmación de lectura del botón. 
 		delay(200);
 		digitalWrite(2, LOW);
 
 		apagar_led();
 		delay(2250);
 	}
-	else if (digitalRead(11) == HIGH)	///MEDIO
+	else if (digitalRead(11) == HIGH)	/// MEDIO
 	{
 		*y = 10;
+		
 		Serial.println("MEDIO");
 		lcd.clear();
 		lcd.setCursor(0, 0);
@@ -167,9 +168,10 @@ void seleccion_nivel(int *y, int *vectI, int *vectII)
 		apagar_led();
 		delay(2250);
 	}
-	else if (digitalRead(12) == HIGH)	///DIFÍCIL
+	else if (digitalRead(12) == HIGH)	/// DIFÍCIL
 	{
 		*y = 15;
+		
 		Serial.println("DIFICIL");
 		lcd.clear();
 		lcd.setCursor(0, 0);
@@ -184,9 +186,10 @@ void seleccion_nivel(int *y, int *vectI, int *vectII)
 		apagar_led();
 		delay(2250);
 	}
-	else if (digitalRead(13) == HIGH)	///EXTREMO
+	else if (digitalRead(13) == HIGH)	/// EXTREMO
 	{
 		*y = 30;
+		
 		Serial.println("EXTREMO");
 		lcd.clear();
 		lcd.setCursor(0, 0);
@@ -204,6 +207,17 @@ void seleccion_nivel(int *y, int *vectI, int *vectII)
 
 	Serial.println();
 	lcd.clear();
+}
+
+
+void crear_enunciado(int *vect, int *x)
+{
+	int i;
+	for (i = 0; i < (*x); i++)
+	{
+		/// Le asigno un valor aleatorio de 0 a 3 al vector psecuencia.
+		*(vect + i) = rand() % (N + 1);
+	}
 }
 
 
@@ -417,7 +431,7 @@ void fin_secuencia() ///2 parpadeos de todos los leds.
 void acierto_fallo(int x, int *fallos)
 {
 	int i;
-	if (x == 0) /// Si acierta
+	if (x == 0) /// Si acierta.
 	{
 		Serial.println("CORRECTO!");
 
