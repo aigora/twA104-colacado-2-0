@@ -164,6 +164,7 @@ void leer_secuencia(int* vect) {
 
 int comparar_secuencia(int *x, int *y) {
 	int i, flag = 0, v1[N], v2[N];
+	PIN pines;
 
 	for (i = 0; i < N; i++) {
 		*(x + i);
