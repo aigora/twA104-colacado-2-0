@@ -357,7 +357,7 @@ void mostrar_fallos(int *x, int *y, int *num)
 //Los vectores de los parámetros son el pulso y la secuencia. Los iré comparando para ver que valores son diferentes. Mostraré por pantalla los fallos.
 {
 	int i;
-	for (i = 0; i < *num - 1; i++)
+	for (i = 0; i < *num; i++)
 	{
 		if (*(x + i) != *(y + i))
 		{
