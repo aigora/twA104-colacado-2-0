@@ -2,11 +2,16 @@
 
 #define _CRT_SECURE_NO_DEPRECATE
 #include<stdlib.h>
+#include<LiquidCrystal.h>
 #define N 4
+#define COLS 16 // Columnas del LCD
+#define ROWS 2 // Filas del LCD
+
+LiquidCrystal lcd(A0, A1, 9, 8, 7, 6);
 
 void inicio_juego();
 void leer_secuencia(int*);
-int comparar_secuencia(int*, int*);
+int comparar_secuencia(int*, int*, int*);
 void game_over();
 void acierto_fallo(int*);
 
@@ -31,9 +36,8 @@ void setup() {
 
 		pinMode(pines.led[i], OUTPUT);
 		pinMode(pines.boton[i], INPUT);
-
 	}
-
+	lcd.begin(COLS, ROWS);
 }
 
 void loop() {
@@ -42,70 +46,88 @@ void loop() {
 	int secuencia[N], pulso[N], *psecuencia, *ppulso;
 	psecuencia = &secuencia[0];
 	ppulso = &pulso[0];
-	for (i = 0; i < N; i++)
-	{
-		///Le asigno un valor aleatorio de 0 a 3 al vector secuencia, sin repetirse.
-		switch (i) {
-		case 0:
-			*(psecuencia + i) = rand() % (N);
-		case 1:
-			do
-			{
-				*(psecuencia + i) = rand() % (N);
-			} while (*(psecuencia + i) == *(psecuencia + i - 1));
-		case 2:
-			do
-			{
-				*(psecuencia + i) = rand() % (N);
-			} while (*(psecuencia + i) == *(psecuencia + i - 1) || *(psecuencia + i) == *(psecuencia + i - 2));
-		case 3:
-			do
-			{
-				*(psecuencia + i) = rand() % (N);
-			} while (*(psecuencia + i) == *(psecuencia + i - 1) || *(psecuencia + i) == *(psecuencia + i - 2) || *(psecuencia + i) == *(psecuencia + i - 3));
-
-		}
-
-	}
-	//ESTO MUESTRA LA CONTRASEÑA POR PANTALLA
-	for (i = 0; i < N; i++) {
-		Serial.println(*(psecuencia + i));
-	}
-
+	
 	inicio_juego();
 
-	while (flagfail == 0) {
+	
+	
+		do
+		{
+			for (i = 0; i < N; i++)
+			{
+				///Le asigno un valor aleatorio de 0 a 3 al vector secuencia, sin repetirse.
+				switch (i) {
+				case 0:
+					*(psecuencia + i) = rand() % (N);
+				case 1:
+					do
+					{
+						*(psecuencia + i) = rand() % (N);
+					} while (*(psecuencia + i) == *(psecuencia + i - 1));
+				case 2:
+					do
+					{
+						*(psecuencia + i) = rand() % (N);
+					} while (*(psecuencia + i) == *(psecuencia + i - 1) || *(psecuencia + i) == *(psecuencia + i - 2));
+				case 3:
+					do
+					{
+						*(psecuencia + i) = rand() % (N);
+					} while (*(psecuencia + i) == *(psecuencia + i - 1) || *(psecuencia + i) == *(psecuencia + i - 2) || *(psecuencia + i) == *(psecuencia + i - 3));
+				}
+			}
 
-		leer_secuencia(ppulso);
-		delay(500);
-		flagfail = comparar_secuencia(psecuencia, ppulso); //(secuencia,pulso)
-		acierto_fallo(&flagfail);
+			//ESTO MUESTRA LA CONTRASEÑA POR PANTALLA
+			for (i = 0; i < N; i++) {
+				Serial.print(*(psecuencia + i));
+			}
+			Serial.println(" ");
+			leer_secuencia(ppulso);
+			delay(500);
 
+			flagfail = comparar_secuencia(psecuencia, ppulso, &flagfail); //(secuencia,pulso)
+			acierto_fallo(&flagfail);
+			
+			 //En caso de fallar tienes 2 intentos más. 
+			if (flagfail != 0) {
 
-	}
+				while (flagfail < 3&& flagfail!=0)
+				{
+					leer_secuencia(ppulso);
+					delay(500);
+					flagfail = comparar_secuencia(psecuencia, ppulso, &flagfail); //(secuencia,pulso)
+					acierto_fallo(&flagfail);
+                }
+			}
+
+		} while (flagfail < 3);
+    
 
 	game_over();
-
+	delay(2500);
 }
 
 void inicio_juego() {
 
-	Serial.println("\nINICIO CONTRA.");
+	Serial.println("\nINICIO DESCIFRA EL CÓDIGO.");
 
 }
 
-void leer_secuencia(int* vect) {
+void leer_secuencia(int *vect) {
 
 	int i;
-	for (i = 0; i < N; i++) {
+
+	for (i = 0; i < N; i++) 
+	{
+		Serial.print("pulso ");
+		Serial.print(i + 1);
+		Serial.print("--> ");
+
 		while ((digitalRead(10) == 0) && (digitalRead(11) == 0) && (digitalRead(12) == 0) && (digitalRead(13) == 0)) {
 
 			digitalRead(10);
-
 			digitalRead(11);
-
 			digitalRead(12);
-
 			digitalRead(13);
 
 		}
@@ -113,11 +135,9 @@ void leer_secuencia(int* vect) {
 		if (digitalRead(10) == HIGH) {
 
 			*(vect + i) = 0;
-
+			
 			digitalWrite(2, HIGH); //CONFIRMACIÓN DE LECTURA.
-
 			delay(200);
-
 			digitalWrite(2, LOW);
 
 		}
@@ -127,9 +147,7 @@ void leer_secuencia(int* vect) {
 			*(vect + i) = 1;
 
 			digitalWrite(3, HIGH);
-
 			delay(200);
-
 			digitalWrite(3, LOW);
 
 		}
@@ -139,9 +157,7 @@ void leer_secuencia(int* vect) {
 			*(vect + i) = 2;
 
 			digitalWrite(4, HIGH);
-
 			delay(200);
-
 			digitalWrite(4, LOW);
 
 		}
@@ -149,76 +165,77 @@ void leer_secuencia(int* vect) {
 		else if (digitalRead(13) == HIGH) {
 
 			*(vect + i) = 3;
-
 			digitalWrite(5, HIGH);
-
 			delay(200);
-
 			digitalWrite(5, LOW);
-
 		}
+		delay(100);
+		Serial.println(*(vect + i));
 	}
 
 	delay(250);
 }
 
-int comparar_secuencia(int *x, int *y) {
-	int i, flag = 0, v1[N], v2[N];
+
+
+int comparar_secuencia(int *x, int *y, int *flag) {
+	int i, v1[N], v2[N];
 	PIN pines;
-
-	for (i = 0; i < N; i++) {
-		*(x + i);
-		v1[i] = *(x + i);
-	}
-	for (i = 0; i < N; i++) {
-		*(y + i);
-		v2[i] = *(y + i);
-	}
+    int aux;
   
-  
-   //ILUMINA LAS QUE HAS FALLADO.
-  
-  for(i=0;i<N;i++)
-  {
-   
-    if(v1[i]!=v2[i])
-    {
-      
-     digitalWrite(pines.led[i], HIGH); 
-     
-     delay(200);
-      
-     digitalWrite(pines.led[i], LOW);
-    }
+  for (i = 0; i < N; i++){
+   v1[i]=*(x + i);
   }
-	  
-	if (v1[0] != v2[0] || v1[1] != v2[1] || v1[2] != v2[2] || v1[3] != v2[3]) //En caso de fallar, activo el flagfail a 1
+  for (i = 0; i < N; i++){
+   v2[i]=*(y + i);
+  }
+  
+  
+	//ILUMINA LAS QUE HAS FALLADO.
+
+	for (i = 0; i < N; i++)
 	{
-		flag = 1;
-	}
-	// Si son el mismo vector, eso es que se ha acertado y el valor de flag seguirá siendo 0;
-	else
-	{
-		flag = 0;
-	}
+		if (*(x + i) != *(y + i)) //Es es si fallas
+		{
+			Serial.print("\nHas fallado en el pulso ");
 
+			Serial.println(i + 1);
 
-	
-	return flag;
+			Serial.print("Tenias que pulsar ");
 
+			Serial.println(*(x + i));
 
+			Serial.print("Has pulsado ");
+
+			Serial.println(*(y + i));
+        }
+      }
+  
+   if(v1[0]==v2[0]&&v1[1]==v2[1]&&v1[2]==v2[2]&&v1[3]==v2[3])
+      {
+        *flag=0;
+      }
+  
+  if(v1[0]!=v2[0]||v1[1]!=v2[1]||v1[2]!=v2[2]||v1[3]!=v2[3])
+      {
+        *flag=*flag + 1;
+      }
+  
+ 
+  return *flag;
 }
 
-void acierto_fallo(int* x) //x es el valor de flagfail
+void acierto_fallo(int *x) //x es el valor de flagfail
 {
 	if (*x == 0)//Si hemos acertado todo.
 	{
 		Serial.println("Acertaste");
+        Serial.println(" ");
 		digitalWrite(2, HIGH);
 		delay(200);
 		digitalWrite(2, LOW);
 		delay(100);
-		digitalWrite(3, HIGH); 
+		digitalWrite(3, HIGH);
 		delay(200);
 		digitalWrite(3, LOW);
 		delay(100);
@@ -229,7 +246,7 @@ void acierto_fallo(int* x) //x es el valor de flagfail
 		digitalWrite(5, HIGH);
 		delay(200);
 		digitalWrite(5, LOW);
-		
+
 		digitalWrite(2, HIGH);
 		digitalWrite(3, HIGH);
 		delay(200);
@@ -241,15 +258,19 @@ void acierto_fallo(int* x) //x es el valor de flagfail
 		delay(200);
 		digitalWrite(4, LOW);
 		digitalWrite(5, LOW);
-		
-		
+
+
 	}
 	else
 	{
 		Serial.println("Fallaste");
+		Serial.print("Te quedan ");
+		Serial.print(3 - *x);
+		Serial.println(" intentos.");
 		//Encontrar la forma de decirle al usuario que botones ha acertado.
-    }
+	}
 }
+
 void game_over() {
 	Serial.println("\nGAME OVER");
 }
