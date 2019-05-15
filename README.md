@@ -12,5 +12,5 @@ Desarrollar 2 minijuegos para la distribución física del proyecto.
 
 1º Simón dice.
 
-2º adivinar el código.
+2º Descifrar el código.
 
